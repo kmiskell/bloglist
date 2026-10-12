@@ -47,7 +47,7 @@ test('POST /api/blogs: correctly adds a valid blog', async () => {
   assert.strictEqual(addedBlog.likes, newBlog.likes)
 })
 
-test('POST /api/blogs: if likes property is mising default the value to 0', async () => {
+test('POST /api/blogs: if likes property is unset, default the value to 0', async () => {
   const newBlog = {
     title: 'Lord of the Hammer',
     author: 'Gerson Boom',
@@ -63,6 +63,40 @@ test('POST /api/blogs: if likes property is mising default the value to 0', asyn
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
   const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
   assert.strictEqual(addedBlog.likes, 0)
+})
+
+test('POST /api/blogs: if title property is unset, blog is not added', async () => {
+  const newBlog = {
+    author: 'Gerson Boom',
+    url: 'https://deltarune.wiki/w/Lord_of_the_Hammer',
+    likes: 3,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+
+})
+
+test('POST /api/blogs: if url proerty is unset, blog is not added', async () => {
+  const newBlog = {
+    title: 'Lord of the Hammer',
+    author: 'Gerson Boom',
+    likes: 3
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+
 })
 
 after(async () => {
